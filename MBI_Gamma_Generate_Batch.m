@@ -1,7 +1,7 @@
 %% Load Data Files
-NSUBJECTS=3;
 cwd=pwd;
-FUNCTIONAL_FILE={cellstr(conn_dir('sub-*_task-rest_bold.nii.gz')); cellstr(conn_dir('sub-*_task-musbid_bold.nii.gz')); cellstr(conn_dir('sub-*_task-facename_run-01_bold.nii.gz')); cellstr(conn_dir('sub-*_task-facename_run-02_bold.nii.gz'))};
+cd ./RAW_BIDS
+FUNCTIONAL_FILE={cellstr(conn_dir('sub-*_task-rest_bold.nii.gz')); cellstr(conn_dir('sub-*_task-musbid*_bold.nii.gz')); cellstr(conn_dir('sub-*_task-facename_run-01_bold.nii.gz')); cellstr(conn_dir('sub-*_task-facename_run-02_bold.nii.gz'))};
 for ses = 1:length(FUNCTIONAL_FILE)
     for sub = 1:length(FUNCTIONAL_FILE{ses})
         temp{sub,ses} = char(FUNCTIONAL_FILE{ses}(sub));
@@ -10,8 +10,8 @@ end
 clear FUNCTIONAL_FILE
 FUNCTIONAL_FILE = temp;
 STRUCTURAL_FILE=cellstr(conn_dir('sub-*_run-02_T1w.nii.gz'));
-%if rem(length(FUNCTIONAL_FILE),NSUBJECTS),error('mismatch number of functional files %n', length(FUNCTIONAL_FILE));end
-if rem(length(STRUCTURAL_FILE),NSUBJECTS),error('mismatch number of anatomical files %n', length(FUNCTIONAL_FILE));end
+cd ../
+NSUBJECTS= length(STRUCTURAL_FILE);
 nsessions=size(FUNCTIONAL_FILE,2);
 FUNCTIONAL_FILE=reshape(FUNCTIONAL_FILE,[NSUBJECTS,nsessions]);
 STRUCTURAL_FILE={STRUCTURAL_FILE{1:NSUBJECTS}};
@@ -22,12 +22,13 @@ TR=0.475; % Repetition time
 %% CONN-SPECIFIC SECTION: RUNS PREPROCESSING/SETUP/DENOISING/ANALYSIS STEPS
 %% Prepares batch structure
 clear batch;
-batch.filename=fullfile(cwd,'MBI_Gamma_Conn');            % New conn_*.mat experiment name
+batch.filename=fullfile(cwd,'MBI_Gamma_Conn.mat');            % New conn_*.mat experiment name
 
 %% SETUP & PREPROCESSING step (using default values for most parameters, see help conn_batch to define non-default values)
 % CONN Setup                                            % Default options (uses all ROIs in conn/rois/ directory); see conn_batch for additional options
 % CONN Setup.preprocessing                               (realignment/coregistration/segmentation/normalization/smoothing)
-batch.Setup.isnew=1;
+batch.Setup.isnew= 0;
+batch.Setup.add = 1;
 batch.Setup.nsubjects=NSUBJECTS;
 batch.Setup.RT=TR;                                        % TR (seconds)
 batch.Setup.functionals=repmat({{}},[NSUBJECTS,1]);       % Point to functional volumes for each subject/session
@@ -55,10 +56,10 @@ end
 batch.Setup.preprocessing.steps='default_mni';
 batch.Setup.preprocessing.sliceorder='interleaved (Siemens)';
 batch.Setup.done=1;
-batch.Setup.overwrite='Yes';
+batch.Setup.overwrite='No';
 
 %% DENOISING step
 % CONN Denoising                                    % Default options (uses White Matter+CSF+realignment+scrubbing+conditions as confound regressors); see conn_batch for additional options
 batch.Denoising.filter=[0.01, 0.1];                 % frequency filter (band-pass values, in Hz)
 batch.Denoising.done=1;
-batch.Denoising.overwrite='Yes';
+batch.Denoising.overwrite='No';
