@@ -55,6 +55,7 @@ else
 end
 batch.Setup.preprocessing.steps='default_mni';
 batch.Setup.preprocessing.sliceorder='interleaved (Siemens)';
+batch.Setup.preprocessing.voxelsize_func = 3
 batch.Setup.done=1;
 batch.Setup.overwrite='No';
 
