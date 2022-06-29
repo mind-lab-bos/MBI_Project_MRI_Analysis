@@ -4,4 +4,5 @@
 #SBATCH -n 1
 #SBATCH -p short
 
+module load matlab/R2020b
 matlab -nodisplay -batch "MBI_GAMMA_CONN_Submit"
