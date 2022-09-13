@@ -67,6 +67,18 @@ for i = 1:size(updatedDataOA, 2)
     end
 end
 
+%load stim order
+cd '/scratch/mquinci/ROI_Analyses/ROI_pipeline_OA/stim_order'
+StimList = dir('*.txt');
+stim_order  = cell(1, numel(StimList));
+for stim = 1:numel(StimList)
+  FileData     = load(StimList(stim).name);
+  stim_order{stim} = FileData;
+  stim_order{stim}(1,:)= [];
+  stim_orderliking{stim} = stim_order{stim}(:,2);
+end
+cd ../
+
 
 %load stim order
 %orderedData = cell(1, numel(sublistOA));
